@@ -1,12 +1,10 @@
 {
   "build": {
-    "builder": "NIXPACKS",
-    "buildCommand": "cd backend && pip install --break-system-packages -r requirements.txt"
+    "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "cd backend && python app.py",
+    "startCommand": "python backend/app.py",
     "healthcheckPath": "/api/health",
-    "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 10
+    "restartPolicyType": "ON_FAILURE"
   }
 }
