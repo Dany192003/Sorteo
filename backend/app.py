@@ -16,7 +16,7 @@ torneo.cargar()
 def health_check():
     return jsonify({'status': 'ok', 'message': 'Backend funcionando correctamente'})
 
-# ===== CONFIGURACIÓN =====
+# ===== CONFIGURACION =====
 @app.route('/api/configuracion', methods=['GET'])
 def get_configuracion():
     return jsonify(torneo.configuracion)
@@ -28,7 +28,7 @@ def set_configuracion():
     if permitir_mismo_juvenil is not None:
         torneo.configuracion['permitir_mismo_juvenil'] = permitir_mismo_juvenil
         torneo.guardar()
-    return jsonify({'message': 'Configuración actualizada'})
+    return jsonify({'message': 'Configuracion actualizada'})
 
 # ===== JUVENILES =====
 @app.route('/api/juveniles', methods=['GET'])
@@ -170,7 +170,7 @@ def add_jugador(equipo_id):
         'jugador': {'id': jugador.id, 'nombre': jugador.nombre, 'edad': jugador.edad}
     }), 201
 
-@app.route('/api/equipos/<int:equipo_id>/jugadores/<int:jugador_id>', methods(['DELETE'])
+@app.route('/api/equipos/<int:equipo_id>/jugadores/<int:jugador_id>', methods=['DELETE'])
 def delete_jugador(equipo_id, jugador_id):
     equipo = next((e for e in torneo.equipos if e.id == equipo_id), None)
     if not equipo:
@@ -199,7 +199,7 @@ def crear_grupos():
     cantidad_grupos = min(opciones, key=lambda x: abs(x - cantidad_grupos))
     
     if total_equipos / cantidad_grupos < 3:
-        return jsonify({'error': f'Con {total_equipos} equipos no se pueden crear {cantidad_grupos} grupos (mínimo 3 por grupo)'}), 400
+        return jsonify({'error': f'Con {total_equipos} equipos no se pueden crear {cantidad_grupos} grupos (minimo 3 por grupo)'}), 400
     
     torneo.grupos = []
     torneo.partidos = []
