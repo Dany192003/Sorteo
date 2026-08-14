@@ -4,9 +4,8 @@ nixPkgs = ["python311", "python311Packages.virtualenv"]
 [phases.install]
 cmds = [
   "python -m venv venv",
-  "source venv/bin/activate",
-  "pip install -r backend/requirements.txt"
+  "./venv/bin/pip install -r backend/requirements.txt"
 ]
 
 [phases.start]
-cmd = "source venv/bin/activate && python backend/app.py"
+cmd = "./venv/bin/python backend/app.py"
