@@ -1,11 +1,5 @@
 [phases.setup]
-nixPkgs = ["python311"]
-
-[phases.install]
-cmds = [
-  "python -c 'import sys; print(sys.version)'",
-  "python -c 'import os; os.system(\"python -m pip install --user flask flask-cors\")'"
-]
+nixPkgs = ["python311", "python311Packages.flask", "python311Packages.flask-cors"]
 
 [phases.start]
 cmd = "python backend/app.py"
