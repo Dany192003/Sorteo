@@ -1,9 +1,8 @@
 [phases.setup]
-nixPkgs = ["python311", "python311Packages.pip"]
-
-[phases.install]
-cmds = [
-  "python -m pip install --user --break-system-packages -r backend/requirements.txt"
+nixPkgs = [
+  "python311",
+  "python311Packages.flask",
+  "python311Packages.flask-cors"
 ]
 
 [phases.start]
