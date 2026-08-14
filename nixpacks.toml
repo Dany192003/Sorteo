@@ -1,10 +1,10 @@
 [phases.setup]
-nixPkgs = ["python311", "python311Packages.flask"]
+nixPkgs = ["python311"]
 
 [phases.install]
 cmds = [
-  "python -c 'import urllib.request; urllib.request.urlretrieve(\"https://raw.githubusercontent.com/pallets/flask/main/requirements.txt\", \"requirements.txt\")'",
-  "python -m pip install --user flask-cors"
+  "python -c 'import sys; print(sys.version)'",
+  "python -c 'import os; os.system(\"python -m pip install --user flask flask-cors\")'"
 ]
 
 [phases.start]
