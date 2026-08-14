@@ -3,6 +3,7 @@ from flask_cors import CORS
 from torneo import Torneo, Juvenil, Equipo, Grupo, Jugador, Partido
 import random
 import math
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -169,7 +170,7 @@ def add_jugador(equipo_id):
         'jugador': {'id': jugador.id, 'nombre': jugador.nombre, 'edad': jugador.edad}
     }), 201
 
-@app.route('/api/equipos/<int:equipo_id>/jugadores/<int:jugador_id>', methods=['DELETE'])
+@app.route('/api/equipos/<int:equipo_id>/jugadores/<int:jugador_id>', methods(['DELETE'])
 def delete_jugador(equipo_id, jugador_id):
     equipo = next((e for e in torneo.equipos if e.id == equipo_id), None)
     if not equipo:
@@ -193,27 +194,21 @@ def crear_grupos():
     if equipos_por_grupo < 3:
         return jsonify({'error': 'Cada grupo debe tener al menos 3 equipos'}), 400
     
-    # Calcular cantidad de grupos (debe ser potencia de 2)
     cantidad_grupos = math.ceil(total_equipos / equipos_por_grupo)
-    
-    # Forzar a potencia de 2
     opciones = [2, 4, 8]
     cantidad_grupos = min(opciones, key=lambda x: abs(x - cantidad_grupos))
     
     if total_equipos / cantidad_grupos < 3:
         return jsonify({'error': f'Con {total_equipos} equipos no se pueden crear {cantidad_grupos} grupos (mínimo 3 por grupo)'}), 400
     
-    # Limpiar datos anteriores
     torneo.grupos = []
     torneo.partidos = []
     
-    # Crear grupos
     letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     for i in range(cantidad_grupos):
         grupo = Grupo(f"Grupo {letras[i]}")
         torneo.grupos.append(grupo)
     
-    # Distribución balanceada
     equipos_mezclados = torneo.equipos.copy()
     random.shuffle(equipos_mezclados)
     
@@ -223,10 +218,8 @@ def crear_grupos():
         grupo_idx = i % cantidad_grupos
         grupos_equipos[grupo_idx].append(equipo)
     
-    # Obtener configuración
     permitir_mismo_juvenil = torneo.configuracion.get('permitir_mismo_juvenil', False)
     
-    # Resolver conflictos de mismo juvenil (solo si no está permitido)
     if not permitir_mismo_juvenil:
         for _ in range(100):
             hubo_cambio = False
@@ -269,11 +262,9 @@ def crear_grupos():
             if not hubo_cambio:
                 break
     
-    # Asignar equipos a grupos
     for i, grupo in enumerate(torneo.grupos):
         grupo.equipos = grupos_equipos[i]
     
-    # Generar partidos de grupos
     partido_id = 1
     for grupo in torneo.grupos:
         equipos_grupo = grupo.equipos
@@ -292,7 +283,6 @@ def crear_grupos():
                 grupo.partidos.append(partido)
                 partido_id += 1
     
-    # Generar llaves con CRUCE CRUZADO
     llaves = generar_llaves_cruzadas()
     
     grupos_data = []
@@ -437,14 +427,9 @@ def registrar_resultado(partido_id):
 
 # ===== LLAVES CRUZADAS =====
 def generar_llaves_cruzadas():
-    """
-    Genera llaves con cruce cruzado estilo mundial:
-    1A vs 2B, 1C vs 2D, 1B vs 2A, 1D vs 2C
-    """
     if not torneo.grupos:
         return None
     
-    # Obtener clasificados (1° y 2° de cada grupo)
     clasificados = {}
     for grupo in torneo.grupos:
         equipos_ordenados = sorted(grupo.equipos, key=lambda e: (-e.puntos, -e.goles_favor, e.goles_contra))
@@ -457,11 +442,7 @@ def generar_llaves_cruzadas():
     if len(clasificados) < 2:
         return None
     
-    # Obtener lista de grupos ordenados
     grupos_ordenados = sorted(clasificados.keys())
-    
-    # CRUCE CRUZADO
-    # Los grupos se emparejan: A-B, C-D, etc.
     cuartos = []
     
     for i in range(0, len(grupos_ordenados), 2):
@@ -469,7 +450,6 @@ def generar_llaves_cruzadas():
             grupo1 = grupos_ordenados[i]
             grupo2 = grupos_ordenados[i + 1]
             
-            # 1° del grupo1 vs 2° del grupo2
             cuartos.append({
                 'id': f'P{len(cuartos) + 1}',
                 'equipo1': clasificados[grupo1]['primero'],
@@ -477,7 +457,6 @@ def generar_llaves_cruzadas():
                 'grupo_origen': f'{grupo1} (1°) vs {grupo2} (2°)'
             })
             
-            # 1° del grupo2 vs 2° del grupo1
             cuartos.append({
                 'id': f'P{len(cuartos) + 1}',
                 'equipo1': clasificados[grupo2]['primero'],
@@ -485,10 +464,8 @@ def generar_llaves_cruzadas():
                 'grupo_origen': f'{grupo2} (1°) vs {grupo1} (2°)'
             })
     
-    # Construir árbol para D3
     def construir_arbol_desde_cuartos(cuartos, inicio, fin):
         if fin - inicio == 1:
-            # Nodo hoja: un partido de cuartos
             partido = cuartos[inicio]
             return {
                 'id': partido['id'],
@@ -502,7 +479,6 @@ def generar_llaves_cruzadas():
         izquierda = construir_arbol_desde_cuartos(cuartos, inicio, mitad)
         derecha = construir_arbol_desde_cuartos(cuartos, mitad, fin)
         
-        # Nodo padre (semifinal o final)
         partido_id = f'P{len(cuartos) + (fin - inicio) // 2}'
         
         return {
@@ -515,10 +491,8 @@ def generar_llaves_cruzadas():
     if len(cuartos) == 0:
         return None
     
-    # Construir el árbol completo
     arbol = construir_arbol_desde_cuartos(cuartos, 0, len(cuartos))
     
-    # Ajustar IDs para que sean secuenciales
     def renombrar_ids(nodo, contador):
         if nodo['id'].startswith('P'):
             contador[0] += 1
@@ -554,4 +528,5 @@ def reiniciar_torneo():
     return jsonify({'message': 'Torneo reiniciado correctamente'})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
