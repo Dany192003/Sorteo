@@ -16,19 +16,38 @@ torneo.cargar()
 def health_check():
     return jsonify({'status': 'ok', 'message': 'Backend funcionando correctamente'})
 
-# ===== CONFIGURACION =====
+# ===== CONFIGURACIÓN =====
 @app.route('/api/configuracion', methods=['GET'])
 def get_configuracion():
-    return jsonify(torneo.configuracion)
+    config = torneo.configuracion.copy()
+    if 'puntos_ganado' not in config:
+        config['puntos_ganado'] = 3
+    if 'puntos_empate' not in config:
+        config['puntos_empate'] = 1
+    if 'puntos_perdido' not in config:
+        config['puntos_perdido'] = 0
+    return jsonify(config)
 
 @app.route('/api/configuracion', methods=['POST'])
 def set_configuracion():
     data = request.json
     permitir_mismo_juvenil = data.get('permitir_mismo_juvenil')
+    puntos_ganado = data.get('puntos_ganado')
+    puntos_empate = data.get('puntos_empate')
+    puntos_perdido = data.get('puntos_perdido')
+    
     if permitir_mismo_juvenil is not None:
         torneo.configuracion['permitir_mismo_juvenil'] = permitir_mismo_juvenil
-        torneo.guardar()
-    return jsonify({'message': 'Configuracion actualizada'})
+    
+    if puntos_ganado is not None:
+        torneo.configuracion['puntos_ganado'] = int(puntos_ganado)
+    if puntos_empate is not None:
+        torneo.configuracion['puntos_empate'] = int(puntos_empate)
+    if puntos_perdido is not None:
+        torneo.configuracion['puntos_perdido'] = int(puntos_perdido)
+    
+    torneo.guardar()
+    return jsonify({'message': 'Configuración actualizada'})
 
 # ===== JUVENILES =====
 @app.route('/api/juveniles', methods=['GET'])
@@ -199,7 +218,16 @@ def crear_grupos():
     cantidad_grupos = min(opciones, key=lambda x: abs(x - cantidad_grupos))
     
     if total_equipos / cantidad_grupos < 3:
-        return jsonify({'error': f'Con {total_equipos} equipos no se pueden crear {cantidad_grupos} grupos (minimo 3 por grupo)'}), 400
+        return jsonify({'error': f'Con {total_equipos} equipos no se pueden crear {cantidad_grupos} grupos (mínimo 3 por grupo)'}), 400
+    
+    # Resetear estadísticas de equipos
+    for equipo in torneo.equipos:
+        equipo.ganados = 0
+        equipo.empatados = 0
+        equipo.perdidos = 0
+        equipo.goles_favor = 0
+        equipo.goles_contra = 0
+        equipo.puntos = 0
     
     torneo.grupos = []
     torneo.partidos = []
@@ -290,7 +318,17 @@ def crear_grupos():
         partidos_grupo = [p for p in torneo.partidos if p.grupo == grupo.nombre]
         grupos_data.append({
             'nombre': grupo.nombre,
-            'equipos': [{'id': e.id, 'nombre': e.nombre, 'juvenil_id': e.juvenil_id} for e in grupo.equipos],
+            'equipos': [{
+                'id': e.id,
+                'nombre': e.nombre,
+                'juvenil_id': e.juvenil_id,
+                'ganados': e.ganados,
+                'empatados': e.empatados,
+                'perdidos': e.perdidos,
+                'goles_favor': e.goles_favor,
+                'goles_contra': e.goles_contra,
+                'puntos': e.puntos
+            } for e in grupo.equipos],
             'partidos': [{
                 'id': p.id,
                 'equipo1': p.equipo1,
@@ -324,7 +362,17 @@ def get_grupos():
         partidos_grupo = [p for p in torneo.partidos if p.grupo == grupo.nombre]
         grupos_data.append({
             'nombre': grupo.nombre,
-            'equipos': [{'id': e.id, 'nombre': e.nombre, 'juvenil_id': e.juvenil_id} for e in grupo.equipos],
+            'equipos': [{
+                'id': e.id,
+                'nombre': e.nombre,
+                'juvenil_id': e.juvenil_id,
+                'ganados': e.ganados,
+                'empatados': e.empatados,
+                'perdidos': e.perdidos,
+                'goles_favor': e.goles_favor,
+                'goles_contra': e.goles_contra,
+                'puntos': e.puntos
+            } for e in grupo.equipos],
             'partidos': [{
                 'id': p.id,
                 'equipo1': p.equipo1,
@@ -388,27 +436,38 @@ def registrar_resultado(partido_id):
     if not equipo1 or not equipo2:
         return jsonify({'error': 'Equipo no encontrado'}), 404
     
+    # Obtener configuración de puntos
+    puntos_ganado = torneo.configuracion.get('puntos_ganado', 3)
+    puntos_empate = torneo.configuracion.get('puntos_empate', 1)
+    puntos_perdido = torneo.configuracion.get('puntos_perdido', 0)
+    
+    # Actualizar estadísticas
     if goles1 > goles2:
         partido.ganador = equipo1.nombre
         equipo1.ganados += 1
-        equipo1.puntos += 3
+        equipo1.puntos += puntos_ganado
         equipo2.perdidos += 1
+        equipo2.puntos += puntos_perdido
     elif goles2 > goles1:
         partido.ganador = equipo2.nombre
         equipo2.ganados += 1
-        equipo2.puntos += 3
+        equipo2.puntos += puntos_ganado
         equipo1.perdidos += 1
+        equipo1.puntos += puntos_perdido
     else:
         partido.ganador = 'Empate'
         equipo1.empatados += 1
-        equipo1.puntos += 1
+        equipo1.puntos += puntos_empate
         equipo2.empatados += 1
-        equipo2.puntos += 1
+        equipo2.puntos += puntos_empate
     
     equipo1.goles_favor += goles1
     equipo1.goles_contra += goles2
     equipo2.goles_favor += goles2
     equipo2.goles_contra += goles1
+    
+    # Recalcular clasificados y llaves
+    llaves = generar_llaves_cruzadas()
     
     torneo.guardar()
     
@@ -422,7 +481,8 @@ def registrar_resultado(partido_id):
             'goles2': partido.goles2,
             'ganador': partido.ganador,
             'jugado': partido.jugado
-        }
+        },
+        'llaves_actualizadas': llaves
     })
 
 # ===== LLAVES CRUZADAS =====
@@ -436,7 +496,9 @@ def generar_llaves_cruzadas():
         if len(equipos_ordenados) >= 2:
             clasificados[grupo.nombre] = {
                 'primero': equipos_ordenados[0].nombre,
-                'segundo': equipos_ordenados[1].nombre
+                'segundo': equipos_ordenados[1].nombre,
+                'puntos_primero': equipos_ordenados[0].puntos,
+                'puntos_segundo': equipos_ordenados[1].puntos
             }
     
     if len(clasificados) < 2:

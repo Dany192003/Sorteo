@@ -65,7 +65,9 @@
         :grupos="grupos"
         :llaves="llaves"
         :partidos="partidos"
+        :configuracion="configuracion"
         @generarTorneo="mostrarDialogoGrupos"
+        @registrarResultado="registrarResultado"
       />
 
       <Configuracion
@@ -109,11 +111,14 @@ export default {
       juveniles: [],
       equipos: [],
       grupos: [],
-      llaves: [],
+      llaves: {},
       partidos: [],
       equipoSeleccionado: null,
       configuracion: {
-        permitir_mismo_juvenil: false
+        permitir_mismo_juvenil: false,
+        puntos_ganado: 3,
+        puntos_empate: 1,
+        puntos_perdido: 0
       }
     }
   },
@@ -153,11 +158,14 @@ export default {
         this.juveniles = juvenilesRes.data
         this.equipos = equiposRes.data
         this.grupos = gruposRes.data.grupos || []
-        this.llaves = gruposRes.data.llaves || []
+        this.llaves = gruposRes.data.llaves || {}
         this.partidos = partidosRes.data
         
         if (gruposRes.data.configuracion) {
-          this.configuracion = gruposRes.data.configuracion
+          this.configuracion = {
+            ...this.configuracion,
+            ...gruposRes.data.configuracion
+          }
         }
         
         if (this.equipoSeleccionado) {
@@ -174,7 +182,10 @@ export default {
     async cargarConfiguracion() {
       try {
         const response = await api.get('/configuracion')
-        this.configuracion = response.data
+        this.configuracion = {
+          ...this.configuracion,
+          ...response.data
+        }
       } catch (error) {
         console.error('Error cargando configuración:', error)
       }
@@ -182,8 +193,9 @@ export default {
     async guardarConfiguracion(config) {
       try {
         await api.post('/configuracion', config)
-        this.configuracion = config
+        this.configuracion = { ...this.configuracion, ...config }
         this.mostrarExito('Configuración guardada correctamente')
+        await this.cargarDatos()
       } catch (error) {
         console.error('Error:', error)
         this.mostrarError('Error al guardar configuración')
@@ -338,7 +350,10 @@ export default {
           goles2
         })
         await this.cargarDatos()
-        this.mostrarExito('Resultado registrado correctamente')
+        this.mostrarExito('✅ Resultado registrado correctamente')
+        if (this.vista === 'dashboard') {
+          this.$forceUpdate()
+        }
       } catch (error) {
         console.error('Error:', error)
         this.mostrarError('Error al registrar resultado')

@@ -188,11 +188,11 @@
       "juvenil_id": 1,
       "jugadores": [],
       "ganados": 0,
-      "empatados": 0,
-      "perdidos": 0,
+      "empatados": 1,
+      "perdidos": 1,
       "goles_favor": 0,
-      "goles_contra": 0,
-      "puntos": 0
+      "goles_contra": 7,
+      "puntos": 1
     },
     {
       "id": 2,
@@ -211,12 +211,12 @@
       "nombre": "Lectores 1",
       "juvenil_id": 3,
       "jugadores": [],
-      "ganados": 0,
+      "ganados": 2,
       "empatados": 0,
       "perdidos": 0,
-      "goles_favor": 0,
-      "goles_contra": 0,
-      "puntos": 0
+      "goles_favor": 13,
+      "goles_contra": 5,
+      "puntos": 6
     },
     {
       "id": 4,
@@ -284,11 +284,11 @@
       "juvenil_id": 9,
       "jugadores": [],
       "ganados": 0,
-      "empatados": 0,
-      "perdidos": 0,
-      "goles_favor": 0,
-      "goles_contra": 0,
-      "puntos": 0
+      "empatados": 1,
+      "perdidos": 1,
+      "goles_favor": 5,
+      "goles_contra": 6,
+      "puntos": 1
     },
     {
       "id": 10,
@@ -476,16 +476,16 @@
       "nombre": "Grupo A",
       "equipos": [
         {
-          "id": 5,
-          "nombre": "Senderos 2"
+          "id": 1,
+          "nombre": "Mujeres y Hombres Nuevos 1"
         },
         {
-          "id": 11,
-          "nombre": "Shadai 1"
+          "id": 9,
+          "nombre": "Catequistas 1"
         },
         {
-          "id": 8,
-          "nombre": "Shadai 2"
+          "id": 3,
+          "nombre": "Lectores 1"
         }
       ],
       "partidos": [
@@ -498,16 +498,16 @@
       "nombre": "Grupo B",
       "equipos": [
         {
-          "id": 10,
-          "nombre": "PCV 1"
+          "id": 4,
+          "nombre": "Coros 3"
         },
         {
-          "id": 2,
-          "nombre": "Senderos 1"
+          "id": 6,
+          "nombre": "San pablo 1"
         },
         {
-          "id": 7,
-          "nombre": "Jufra 1"
+          "id": 15,
+          "nombre": "Jeshua 2"
         }
       ],
       "partidos": [
@@ -520,16 +520,16 @@
       "nombre": "Grupo C",
       "equipos": [
         {
-          "id": 6,
-          "nombre": "San pablo 1"
+          "id": 14,
+          "nombre": "Mujeres y Hombres Nuevos 2"
         },
         {
           "id": 5,
           "nombre": "Coros 1"
         },
         {
-          "id": 2,
-          "nombre": "Coros 2"
+          "id": 10,
+          "nombre": "PCV 1"
         }
       ],
       "partidos": [
@@ -542,16 +542,16 @@
       "nombre": "Grupo D",
       "equipos": [
         {
-          "id": 13,
-          "nombre": "Pentecostes 1"
+          "id": 7,
+          "nombre": "Jufra 1"
         },
         {
-          "id": 4,
-          "nombre": "Coros 3"
+          "id": 6,
+          "nombre": "Mujeres y Hombres Nuevos 3"
         },
         {
-          "id": 8,
-          "nombre": "Confirmacion 1"
+          "id": 2,
+          "nombre": "Coros 2"
         }
       ],
       "partidos": [
@@ -564,16 +564,16 @@
       "nombre": "Grupo E",
       "equipos": [
         {
-          "id": 12,
-          "nombre": "Jeshua 1"
+          "id": 4,
+          "nombre": "Ssael 1"
         },
         {
           "id": 1,
           "nombre": "Pentecostes 2"
         },
         {
-          "id": 3,
-          "nombre": "PCV 2"
+          "id": 5,
+          "nombre": "Senderos 2"
         }
       ],
       "partidos": [
@@ -586,16 +586,16 @@
       "nombre": "Grupo F",
       "equipos": [
         {
-          "id": 14,
-          "nombre": "Mujeres y Hombres Nuevos 2"
-        },
-        {
-          "id": 4,
-          "nombre": "Ssael 1"
-        },
-        {
           "id": 16,
           "nombre": "Ssael 2"
+        },
+        {
+          "id": 11,
+          "nombre": "Shadai 1"
+        },
+        {
+          "id": 8,
+          "nombre": "Shadai 2"
         }
       ],
       "partidos": [
@@ -608,16 +608,16 @@
       "nombre": "Grupo G",
       "equipos": [
         {
-          "id": 1,
-          "nombre": "Mujeres y Hombres Nuevos 1"
+          "id": 13,
+          "nombre": "Pentecostes 1"
         },
         {
-          "id": 6,
-          "nombre": "Mujeres y Hombres Nuevos 3"
+          "id": 7,
+          "nombre": "Lectores 2"
         },
         {
-          "id": 9,
-          "nombre": "Catequistas 1"
+          "id": 2,
+          "nombre": "Senderos 1"
         }
       ],
       "partidos": [
@@ -630,16 +630,16 @@
       "nombre": "Grupo H",
       "equipos": [
         {
-          "id": 15,
-          "nombre": "Jeshua 2"
-        },
-        {
-          "id": 7,
-          "nombre": "Lectores 2"
-        },
-        {
           "id": 3,
-          "nombre": "Lectores 1"
+          "nombre": "PCV 2"
+        },
+        {
+          "id": 12,
+          "nombre": "Jeshua 1"
+        },
+        {
+          "id": 8,
+          "nombre": "Confirmacion 1"
         }
       ],
       "partidos": [
@@ -652,41 +652,41 @@
   "partidos": [
     {
       "id": 1,
-      "equipo1": 5,
-      "equipo2": 11,
+      "equipo1": 1,
+      "equipo2": 9,
       "grupo": "Grupo A",
       "etapa": "grupos",
-      "goles1": null,
-      "goles2": null,
-      "ganador": null,
-      "jugado": false
+      "goles1": 0,
+      "goles2": 0,
+      "ganador": "Empate",
+      "jugado": true
     },
     {
       "id": 2,
-      "equipo1": 5,
-      "equipo2": 8,
+      "equipo1": 1,
+      "equipo2": 3,
       "grupo": "Grupo A",
       "etapa": "grupos",
-      "goles1": null,
-      "goles2": null,
-      "ganador": null,
-      "jugado": false
+      "goles1": 0,
+      "goles2": 7,
+      "ganador": "Lectores 1",
+      "jugado": true
     },
     {
       "id": 3,
-      "equipo1": 11,
-      "equipo2": 8,
+      "equipo1": 9,
+      "equipo2": 3,
       "grupo": "Grupo A",
       "etapa": "grupos",
-      "goles1": null,
-      "goles2": null,
-      "ganador": null,
-      "jugado": false
+      "goles1": 5,
+      "goles2": 6,
+      "ganador": "Lectores 1",
+      "jugado": true
     },
     {
       "id": 4,
-      "equipo1": 10,
-      "equipo2": 2,
+      "equipo1": 4,
+      "equipo2": 6,
       "grupo": "Grupo B",
       "etapa": "grupos",
       "goles1": null,
@@ -696,8 +696,8 @@
     },
     {
       "id": 5,
-      "equipo1": 10,
-      "equipo2": 7,
+      "equipo1": 4,
+      "equipo2": 15,
       "grupo": "Grupo B",
       "etapa": "grupos",
       "goles1": null,
@@ -707,8 +707,8 @@
     },
     {
       "id": 6,
-      "equipo1": 2,
-      "equipo2": 7,
+      "equipo1": 6,
+      "equipo2": 15,
       "grupo": "Grupo B",
       "etapa": "grupos",
       "goles1": null,
@@ -718,7 +718,7 @@
     },
     {
       "id": 7,
-      "equipo1": 6,
+      "equipo1": 14,
       "equipo2": 5,
       "grupo": "Grupo C",
       "etapa": "grupos",
@@ -729,8 +729,8 @@
     },
     {
       "id": 8,
-      "equipo1": 6,
-      "equipo2": 2,
+      "equipo1": 14,
+      "equipo2": 10,
       "grupo": "Grupo C",
       "etapa": "grupos",
       "goles1": null,
@@ -741,7 +741,7 @@
     {
       "id": 9,
       "equipo1": 5,
-      "equipo2": 2,
+      "equipo2": 10,
       "grupo": "Grupo C",
       "etapa": "grupos",
       "goles1": null,
@@ -751,8 +751,8 @@
     },
     {
       "id": 10,
-      "equipo1": 13,
-      "equipo2": 4,
+      "equipo1": 7,
+      "equipo2": 6,
       "grupo": "Grupo D",
       "etapa": "grupos",
       "goles1": null,
@@ -762,8 +762,8 @@
     },
     {
       "id": 11,
-      "equipo1": 13,
-      "equipo2": 8,
+      "equipo1": 7,
+      "equipo2": 2,
       "grupo": "Grupo D",
       "etapa": "grupos",
       "goles1": null,
@@ -773,8 +773,8 @@
     },
     {
       "id": 12,
-      "equipo1": 4,
-      "equipo2": 8,
+      "equipo1": 6,
+      "equipo2": 2,
       "grupo": "Grupo D",
       "etapa": "grupos",
       "goles1": null,
@@ -784,7 +784,7 @@
     },
     {
       "id": 13,
-      "equipo1": 12,
+      "equipo1": 4,
       "equipo2": 1,
       "grupo": "Grupo E",
       "etapa": "grupos",
@@ -795,8 +795,8 @@
     },
     {
       "id": 14,
-      "equipo1": 12,
-      "equipo2": 3,
+      "equipo1": 4,
+      "equipo2": 5,
       "grupo": "Grupo E",
       "etapa": "grupos",
       "goles1": null,
@@ -807,7 +807,7 @@
     {
       "id": 15,
       "equipo1": 1,
-      "equipo2": 3,
+      "equipo2": 5,
       "grupo": "Grupo E",
       "etapa": "grupos",
       "goles1": null,
@@ -817,8 +817,8 @@
     },
     {
       "id": 16,
-      "equipo1": 14,
-      "equipo2": 4,
+      "equipo1": 16,
+      "equipo2": 11,
       "grupo": "Grupo F",
       "etapa": "grupos",
       "goles1": null,
@@ -828,8 +828,8 @@
     },
     {
       "id": 17,
-      "equipo1": 14,
-      "equipo2": 16,
+      "equipo1": 16,
+      "equipo2": 8,
       "grupo": "Grupo F",
       "etapa": "grupos",
       "goles1": null,
@@ -839,8 +839,8 @@
     },
     {
       "id": 18,
-      "equipo1": 4,
-      "equipo2": 16,
+      "equipo1": 11,
+      "equipo2": 8,
       "grupo": "Grupo F",
       "etapa": "grupos",
       "goles1": null,
@@ -850,8 +850,8 @@
     },
     {
       "id": 19,
-      "equipo1": 1,
-      "equipo2": 6,
+      "equipo1": 13,
+      "equipo2": 7,
       "grupo": "Grupo G",
       "etapa": "grupos",
       "goles1": null,
@@ -861,8 +861,8 @@
     },
     {
       "id": 20,
-      "equipo1": 1,
-      "equipo2": 9,
+      "equipo1": 13,
+      "equipo2": 2,
       "grupo": "Grupo G",
       "etapa": "grupos",
       "goles1": null,
@@ -872,8 +872,8 @@
     },
     {
       "id": 21,
-      "equipo1": 6,
-      "equipo2": 9,
+      "equipo1": 7,
+      "equipo2": 2,
       "grupo": "Grupo G",
       "etapa": "grupos",
       "goles1": null,
@@ -883,8 +883,8 @@
     },
     {
       "id": 22,
-      "equipo1": 15,
-      "equipo2": 7,
+      "equipo1": 3,
+      "equipo2": 12,
       "grupo": "Grupo H",
       "etapa": "grupos",
       "goles1": null,
@@ -894,8 +894,8 @@
     },
     {
       "id": 23,
-      "equipo1": 15,
-      "equipo2": 3,
+      "equipo1": 3,
+      "equipo2": 8,
       "grupo": "Grupo H",
       "etapa": "grupos",
       "goles1": null,
@@ -905,8 +905,8 @@
     },
     {
       "id": 24,
-      "equipo1": 7,
-      "equipo2": 3,
+      "equipo1": 12,
+      "equipo2": 8,
       "grupo": "Grupo H",
       "etapa": "grupos",
       "goles1": null,

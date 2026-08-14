@@ -191,3 +191,12 @@ class Torneo:
         except Exception as e:
             print(f"Error al cargar datos: {e}")
             return False
+# Agregar al final de la clase Torneo, antes de guardar()
+
+    def get_puntos_config(self):
+        """Retorna la configuración de puntos"""
+        return {
+            'ganado': self.configuracion.get('puntos_ganado', 3),
+            'empate': self.configuracion.get('puntos_empate', 1),
+            'perdido': self.configuracion.get('puntos_perdido', 0)
+        }
