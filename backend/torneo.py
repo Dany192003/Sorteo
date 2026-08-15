@@ -1,12 +1,12 @@
 import json
 import os
 import random
+from datetime import datetime
 
 class Jugador:
-    def __init__(self, id, nombre, edad):
+    def __init__(self, id, nombre):
         self.id = id
         self.nombre = nombre
-        self.edad = edad
 
 class Equipo:
     def __init__(self, id, nombre, juvenil_id):
@@ -46,21 +46,23 @@ class Partido:
         self.jugado = False
 
 class Torneo:
-    def __init__(self, nombre):
+    def __init__(self, nombre, archivo=None):
         self.nombre = nombre
         self.juveniles = []
         self.equipos = []
         self.grupos = []
         self.partidos = []
-        self.archivo = 'torneo_data.json'
+        self.archivo = archivo or f'torneo_{nombre.replace(" ", "_")}.json'
         self.contadores = {
             'juvenil': 0,
             'equipo': 0,
             'jugador': 0
         }
-        # Configuración
         self.configuracion = {
-            'permitir_mismo_juvenil': False  # False = no se enfrentan, True = pueden enfrentarse
+            'permitir_mismo_juvenil': False,
+            'puntos_ganado': 3,
+            'puntos_empate': 1,
+            'puntos_perdido': 0
         }
     
     def generar_id(self, tipo):
@@ -93,7 +95,7 @@ class Torneo:
                 'id': e.id,
                 'nombre': e.nombre,
                 'juvenil_id': e.juvenil_id,
-                'jugadores': [{'id': j.id, 'nombre': j.nombre, 'edad': j.edad} for j in e.jugadores],
+                'jugadores': [{'id': j.id, 'nombre': j.nombre} for j in e.jugadores],
                 'ganados': e.ganados,
                 'empatados': e.empatados,
                 'perdidos': e.perdidos,
@@ -133,9 +135,14 @@ class Torneo:
             with open(self.archivo, 'r', encoding='utf-8') as f:
                 data = json.load(f)
             
-            self.nombre = data.get('nombre', 'Torneo Juvenil 2026')
+            self.nombre = data.get('nombre', self.nombre)
             self.contadores = data.get('contadores', {'juvenil': 0, 'equipo': 0, 'jugador': 0})
-            self.configuracion = data.get('configuracion', {'permitir_mismo_juvenil': False})
+            self.configuracion = data.get('configuracion', {
+                'permitir_mismo_juvenil': False,
+                'puntos_ganado': 3,
+                'puntos_empate': 1,
+                'puntos_perdido': 0
+            })
             
             self.juveniles = []
             for j_data in data.get('juveniles', []):
@@ -152,7 +159,7 @@ class Torneo:
                 equipo.goles_contra = e_data.get('goles_contra', 0)
                 equipo.puntos = e_data.get('puntos', 0)
                 for j_data in e_data.get('jugadores', []):
-                    jugador = Jugador(j_data['id'], j_data['nombre'], j_data['edad'])
+                    jugador = Jugador(j_data['id'], j_data['nombre'])
                     equipo.jugadores.append(jugador)
                 self.equipos.append(equipo)
             
@@ -191,10 +198,8 @@ class Torneo:
         except Exception as e:
             print(f"Error al cargar datos: {e}")
             return False
-# Agregar al final de la clase Torneo, antes de guardar()
 
     def get_puntos_config(self):
-        """Retorna la configuración de puntos"""
         return {
             'ganado': self.configuracion.get('puntos_ganado', 3),
             'empate': self.configuracion.get('puntos_empate', 1),

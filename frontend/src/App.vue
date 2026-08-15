@@ -16,6 +16,7 @@
         <button @click="vista = 'jugadores'" :class="{ active: vista === 'jugadores' }">👤 Jugadores</button>
         <button @click="vista = 'torneo'" :class="{ active: vista === 'torneo' }">🏆 Torneo</button>
         <button @click="vista = 'configuracion'" :class="{ active: vista === 'configuracion' }">⚙️ Configuración</button>
+        <button @click="vista = 'torneos'" :class="{ active: vista === 'torneos' }">📁 Torneos</button>
       </div>
     </header>
 
@@ -75,6 +76,15 @@
         :configuracion="configuracion"
         @guardarConfiguracion="guardarConfiguracion"
       />
+
+      <GestionTorneos
+        v-if="vista === 'torneos'"
+        :torneoActual="torneoActual"
+        @cambiarTorneo="cambiarTorneo"
+        @crearTorneo="crearTorneo"
+        @eliminarTorneo="eliminarTorneo"
+        @recargar="cargarDatos"
+      />
     </main>
   </div>
 </template>
@@ -87,6 +97,7 @@ import Equipos from './components/Equipos.vue'
 import Jugadores from './components/Jugadores.vue'
 import Torneo from './components/Torneo.vue'
 import Configuracion from './components/Configuracion.vue'
+import GestionTorneos from './components/GestionTorneos.vue'
 
 const API_BASE_URL = 'http://localhost:5000/api'
 const api = axios.create({
@@ -102,7 +113,8 @@ export default {
     Equipos,
     Jugadores,
     Torneo,
-    Configuracion
+    Configuracion,
+    GestionTorneos
   },
   data() {
     return {
@@ -114,6 +126,7 @@ export default {
       llaves: {},
       partidos: [],
       equipoSeleccionado: null,
+      torneoActual: 'torneo_principal',
       configuracion: {
         permitir_mismo_juvenil: false,
         puntos_ganado: 3,
@@ -133,6 +146,7 @@ export default {
   },
   mounted() {
     this.checkBackend()
+    this.cargarTorneoActual()
     this.cargarDatos()
     this.cargarConfiguracion()
   },
@@ -145,6 +159,50 @@ export default {
         console.error('Error conectando al backend:', error)
         this.backendStatus = null
         this.mostrarError('Error de conexión con el servidor')
+      }
+    },
+    async cargarTorneoActual() {
+      try {
+        const response = await api.get('/torneos/actual')
+        this.torneoActual = response.data.nombre
+      } catch (error) {
+        console.error('Error cargando torneo actual:', error)
+      }
+    },
+    async cambiarTorneo(nombre) {
+      try {
+        await api.post('/torneos/actual', { nombre })
+        this.torneoActual = nombre
+        await this.cargarDatos()
+        await this.cargarConfiguracion()
+        this.mostrarExito(`Torneo "${nombre}" cargado correctamente`)
+        this.vista = 'dashboard'
+      } catch (error) {
+        console.error('Error cambiando torneo:', error)
+        this.mostrarError('Error al cambiar torneo')
+      }
+    },
+    async crearTorneo(nombre) {
+      try {
+        await api.post('/torneos', { nombre })
+        await this.cambiarTorneo(nombre)
+        this.mostrarExito(`Torneo "${nombre}" creado correctamente`)
+      } catch (error) {
+        console.error('Error creando torneo:', error)
+        this.mostrarError('Error al crear torneo')
+      }
+    },
+    async eliminarTorneo(nombre) {
+      if (!confirm(`¿Eliminar el torneo "${nombre}"? Esta acción no se puede deshacer.`)) return
+      try {
+        await api.delete(`/torneos/${nombre}`)
+        this.mostrarExito(`Torneo "${nombre}" eliminado`)
+        await this.cargarTorneoActual()
+        await this.cargarDatos()
+        await this.cargarConfiguracion()
+      } catch (error) {
+        console.error('Error eliminando torneo:', error)
+        this.mostrarError('Error al eliminar torneo')
       }
     },
     async cargarDatos() {
@@ -255,9 +313,9 @@ export default {
       this.equipoSeleccionado = null
       this.vista = 'equipos'
     },
-    async agregarJugador({ equipoId, nombre, edad }) {
+    async agregarJugador({ equipoId, nombre }) {
       try {
-        await api.post(`/equipos/${equipoId}/jugadores`, { nombre, edad })
+        await api.post(`/equipos/${equipoId}/jugadores`, { nombre })
         await this.cargarDatos()
         this.mostrarExito('Jugador agregado correctamente')
       } catch (error) {
