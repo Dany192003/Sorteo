@@ -32,6 +32,7 @@
         @generarTorneo="mostrarDialogoGrupos"
         @vaciarDatos="vaciarDatos"
         @reiniciarTorneo="reiniciarTorneo"
+        @reiniciarResultados="reiniciarResultados"
       />
 
       <Juveniles
@@ -415,6 +416,20 @@ export default {
       } catch (error) {
         console.error('Error:', error)
         this.mostrarError('Error al registrar resultado')
+      }
+    },
+    async reiniciarResultados() {
+      if (!confirm('⚠️ ¿Estás seguro de reiniciar TODOS los resultados? Los marcadores se borrarán pero los grupos se mantendrán.')) return
+      try {
+        await api.post('/reiniciar_resultados')
+        await this.cargarDatos()
+        this.mostrarExito('✅ Resultados reiniciados correctamente')
+        if (this.vista === 'dashboard') {
+          this.$forceUpdate()
+        }
+      } catch (error) {
+        console.error('Error:', error)
+        this.mostrarError('Error al reiniciar resultados')
       }
     },
     async vaciarDatos() {

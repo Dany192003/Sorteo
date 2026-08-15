@@ -29,6 +29,7 @@
 
     <div class="dashboard-actions">
       <button @click="$emit('generarTorneo')" class="btn-success">🔄 Generar Torneo</button>
+      <button @click="$emit('reiniciarResultados')" class="btn-warning">🔄 Reiniciar Resultados</button>
       <button @click="$emit('vaciarDatos')" class="btn-danger">🗑️ Vaciar</button>
       <button @click="$emit('reiniciarTorneo')" class="btn-danger" style="background: linear-gradient(135deg, #e63946, #c1121f);">🔄 Reiniciar</button>
     </div>
@@ -113,7 +114,7 @@ export default {
     totalJugadores: Number,
     partidos: Array
   },
-  emits: ['cambiarVista', 'generarTorneo', 'vaciarDatos', 'reiniciarTorneo'],
+  emits: ['cambiarVista', 'generarTorneo', 'vaciarDatos', 'reiniciarTorneo', 'reiniciarResultados'],
   computed: {
     partidosPendientes() {
       return this.partidos ? this.partidos.filter(p => !p.jugado).length : 0
@@ -191,6 +192,23 @@ export default {
 .btn-success:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 20px rgba(0, 180, 216, 0.4);
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, #f39c12, #e67e22);
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 13px;
+}
+
+.btn-warning:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(243, 156, 18, 0.4);
 }
 
 .btn-danger {

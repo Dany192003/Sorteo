@@ -523,7 +523,6 @@ def get_partidos():
         })
     return jsonify(partidos_data)
 
-# Ruta OPTIONS explícita para resultados
 @app.route('/api/partidos/<int:partido_id>/resultado', methods=['OPTIONS'])
 def options_resultado(partido_id):
     return '', 200
@@ -597,6 +596,31 @@ def registrar_resultado(partido_id):
         },
         'llaves_actualizadas': llaves
     })
+
+# ===== REINICIAR RESULTADOS (sin borrar grupos) =====
+@app.route('/api/reiniciar_resultados', methods=['POST', 'OPTIONS'])
+def reiniciar_resultados():
+    torneo = get_torneo_actual()
+    
+    # Reiniciar todos los partidos
+    for partido in torneo.partidos:
+        partido.goles1 = None
+        partido.goles2 = None
+        partido.ganador = None
+        partido.jugado = False
+    
+    # Reiniciar estadísticas de equipos
+    for equipo in torneo.equipos:
+        equipo.ganados = 0
+        equipo.empatados = 0
+        equipo.perdidos = 0
+        equipo.goles_favor = 0
+        equipo.goles_contra = 0
+        equipo.puntos = 0
+    
+    torneo.guardar()
+    
+    return jsonify({'message': 'Resultados reiniciados correctamente'})
 
 # ===== LLAVES CRUZADAS =====
 def generar_llaves_cruzadas(torneo):
