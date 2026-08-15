@@ -166,11 +166,11 @@
       "juvenil_id": 1,
       "jugadores": [],
       "ganados": 0,
-      "empatados": 0,
-      "perdidos": 0,
+      "empatados": 1,
+      "perdidos": 1,
       "goles_favor": 0,
-      "goles_contra": 0,
-      "puntos": 0
+      "goles_contra": 5,
+      "puntos": 1
     },
     {
       "id": 11,
@@ -310,11 +310,11 @@
       "juvenil_id": 12,
       "jugadores": [],
       "ganados": 0,
-      "empatados": 0,
+      "empatados": 1,
       "perdidos": 0,
       "goles_favor": 0,
       "goles_contra": 0,
-      "puntos": 0
+      "puntos": 1
     },
     {
       "id": 24,
@@ -333,12 +333,12 @@
       "nombre": "PCV 4",
       "juvenil_id": 4,
       "jugadores": [],
-      "ganados": 0,
+      "ganados": 1,
       "empatados": 0,
       "perdidos": 0,
-      "goles_favor": 0,
+      "goles_favor": 5,
       "goles_contra": 0,
-      "puntos": 0
+      "puntos": 3
     },
     {
       "id": 26,
@@ -486,10 +486,10 @@
       "equipo2": 23,
       "grupo": "Grupo A",
       "etapa": "grupos",
-      "goles1": null,
-      "goles2": null,
-      "ganador": null,
-      "jugado": false
+      "goles1": 0,
+      "goles2": 0,
+      "ganador": "Empate",
+      "jugado": true
     },
     {
       "id": 2,
@@ -497,10 +497,10 @@
       "equipo2": 25,
       "grupo": "Grupo A",
       "etapa": "grupos",
-      "goles1": null,
-      "goles2": null,
-      "ganador": null,
-      "jugado": false
+      "goles1": 0,
+      "goles2": 5,
+      "ganador": "PCV 4",
+      "jugado": true
     },
     {
       "id": 3,

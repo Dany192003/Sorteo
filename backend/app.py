@@ -7,21 +7,25 @@ import os
 import json
 
 app = Flask(__name__)
-CORS(app)
 
-# Diccionario para almacenar torneos activos
+# ===== CONFIGURACIÓN CORS =====
+CORS(app, resources={
+    r"/api/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization", "ngrok-skip-browser-warning"]
+    }
+})
+
+# ===== VARIABLES GLOBALES =====
 torneos = {}
+torneo_actual = None
 TORNEOS_DIR = 'torneos'
 
-# Crear directorio para torneos si no existe
 if not os.path.exists(TORNEOS_DIR):
     os.makedirs(TORNEOS_DIR)
 
-# Torneo actual por defecto
-torneo_actual = None
-
 def get_torneo(nombre):
-    """Obtiene o crea un torneo por nombre"""
     if nombre not in torneos:
         archivo = os.path.join(TORNEOS_DIR, f'{nombre.replace(" ", "_")}.json')
         torneo = Torneo(nombre, archivo)
@@ -32,7 +36,6 @@ def get_torneo(nombre):
 def get_torneo_actual():
     global torneo_actual
     if torneo_actual is None:
-        # Buscar torneo por defecto o crear uno nuevo
         if os.path.exists(os.path.join(TORNEOS_DIR, 'torneo_principal.json')):
             torneo_actual = get_torneo('torneo_principal')
         else:
@@ -41,18 +44,14 @@ def get_torneo_actual():
             torneos['torneo_principal'] = torneo_actual
     return torneo_actual
 
-def guardar_torneo(torneo):
-    torneo.guardar()
-
 # ===== HEALTH =====
-@app.route('/api/health', methods=['GET'])
+@app.route('/api/health', methods=['GET', 'OPTIONS'])
 def health_check():
     return jsonify({'status': 'ok', 'message': 'Backend funcionando correctamente'})
 
 # ===== TORNEOS =====
-@app.route('/api/torneos', methods=['GET'])
+@app.route('/api/torneos', methods=['GET', 'OPTIONS'])
 def listar_torneos():
-    """Lista todos los torneos disponibles"""
     archivos = [f for f in os.listdir(TORNEOS_DIR) if f.endswith('.json')]
     torneos_list = []
     for archivo in archivos:
@@ -63,9 +62,8 @@ def listar_torneos():
         })
     return jsonify(torneos_list)
 
-@app.route('/api/torneos', methods=['POST'])
+@app.route('/api/torneos', methods=['POST', 'OPTIONS'])
 def crear_torneo():
-    """Crea un nuevo torneo"""
     data = request.json
     nombre = data.get('nombre')
     
@@ -85,9 +83,8 @@ def crear_torneo():
         'torneo': {'nombre': nombre}
     }), 201
 
-@app.route('/api/torneos/<nombre>', methods=['DELETE'])
+@app.route('/api/torneos/<nombre>', methods=['DELETE', 'OPTIONS'])
 def eliminar_torneo(nombre):
-    """Elimina un torneo"""
     archivo = os.path.join(TORNEOS_DIR, f'{nombre.replace(" ", "_")}.json')
     if not os.path.exists(archivo):
         return jsonify({'error': 'Torneo no encontrado'}), 404
@@ -98,18 +95,16 @@ def eliminar_torneo(nombre):
     
     return jsonify({'message': 'Torneo eliminado correctamente'})
 
-@app.route('/api/torneos/actual', methods=['GET'])
+@app.route('/api/torneos/actual', methods=['GET', 'OPTIONS'])
 def get_actual():
-    """Obtiene el torneo actual"""
     torneo = get_torneo_actual()
     return jsonify({
         'nombre': torneo.nombre,
         'configuracion': torneo.configuracion
     })
 
-@app.route('/api/torneos/actual', methods=['POST'])
+@app.route('/api/torneos/actual', methods=['POST', 'OPTIONS'])
 def set_actual():
-    """Cambia el torneo actual"""
     global torneo_actual
     data = request.json
     nombre = data.get('nombre')
@@ -128,13 +123,12 @@ def set_actual():
     })
 
 # ===== CONFIGURACIÓN =====
-@app.route('/api/configuracion', methods=['GET'])
+@app.route('/api/configuracion', methods=['GET', 'OPTIONS'])
 def get_configuracion():
     torneo = get_torneo_actual()
-    config = torneo.configuracion.copy()
-    return jsonify(config)
+    return jsonify(torneo.configuracion)
 
-@app.route('/api/configuracion', methods=['POST'])
+@app.route('/api/configuracion', methods=['POST', 'OPTIONS'])
 def set_configuracion():
     torneo = get_torneo_actual()
     data = request.json
@@ -157,7 +151,7 @@ def set_configuracion():
     return jsonify({'message': 'Configuración actualizada'})
 
 # ===== JUVENILES =====
-@app.route('/api/juveniles', methods=['GET'])
+@app.route('/api/juveniles', methods=['GET', 'OPTIONS'])
 def get_juveniles():
     torneo = get_torneo_actual()
     juveniles_data = []
@@ -169,7 +163,7 @@ def get_juveniles():
         })
     return jsonify(juveniles_data)
 
-@app.route('/api/juveniles', methods=['POST'])
+@app.route('/api/juveniles', methods=['POST', 'OPTIONS'])
 def add_juvenil():
     torneo = get_torneo_actual()
     data = request.json
@@ -188,7 +182,7 @@ def add_juvenil():
         'juvenil': {'id': juvenil.id, 'nombre': juvenil.nombre}
     }), 201
 
-@app.route('/api/juveniles/<int:id>', methods=['DELETE'])
+@app.route('/api/juveniles/<int:id>', methods=['DELETE', 'OPTIONS'])
 def delete_juvenil(id):
     torneo = get_torneo_actual()
     juvenil = next((j for j in torneo.juveniles if j.id == id), None)
@@ -206,7 +200,7 @@ def delete_juvenil(id):
     return jsonify({'message': 'Juvenil eliminado correctamente'})
 
 # ===== EQUIPOS =====
-@app.route('/api/equipos', methods=['GET'])
+@app.route('/api/equipos', methods=['GET', 'OPTIONS'])
 def get_equipos():
     torneo = get_torneo_actual()
     equipos_data = []
@@ -225,7 +219,7 @@ def get_equipos():
         })
     return jsonify(equipos_data)
 
-@app.route('/api/equipos', methods=['POST'])
+@app.route('/api/equipos', methods=['POST', 'OPTIONS'])
 def add_equipo():
     torneo = get_torneo_actual()
     data = request.json
@@ -260,7 +254,7 @@ def add_equipo():
         'equipo': {'id': equipo.id, 'nombre': equipo.nombre, 'juvenil_id': equipo.juvenil_id}
     }), 201
 
-@app.route('/api/equipos/<int:id>', methods=['DELETE'])
+@app.route('/api/equipos/<int:id>', methods=['DELETE', 'OPTIONS'])
 def delete_equipo(id):
     torneo = get_torneo_actual()
     equipo = next((e for e in torneo.equipos if e.id == id), None)
@@ -279,7 +273,7 @@ def delete_equipo(id):
     return jsonify({'message': 'Equipo eliminado correctamente'})
 
 # ===== JUGADORES =====
-@app.route('/api/equipos/<int:equipo_id>/jugadores', methods=['POST'])
+@app.route('/api/equipos/<int:equipo_id>/jugadores', methods=['POST', 'OPTIONS'])
 def add_jugador(equipo_id):
     torneo = get_torneo_actual()
     data = request.json
@@ -302,7 +296,7 @@ def add_jugador(equipo_id):
         'jugador': {'id': jugador.id, 'nombre': jugador.nombre}
     }), 201
 
-@app.route('/api/equipos/<int:equipo_id>/jugadores/<int:jugador_id>', methods=['DELETE'])
+@app.route('/api/equipos/<int:equipo_id>/jugadores/<int:jugador_id>', methods=['DELETE', 'OPTIONS'])
 def delete_jugador(equipo_id, jugador_id):
     torneo = get_torneo_actual()
     equipo = next((e for e in torneo.equipos if e.id == equipo_id), None)
@@ -315,7 +309,47 @@ def delete_jugador(equipo_id, jugador_id):
     return jsonify({'message': 'Jugador eliminado correctamente'})
 
 # ===== GRUPOS =====
-@app.route('/api/grupos', methods=['POST'])
+@app.route('/api/grupos', methods=['GET', 'OPTIONS'])
+def get_grupos():
+    torneo = get_torneo_actual()
+    if not torneo.grupos:
+        return jsonify({'message': 'No hay grupos creados', 'grupos': [], 'llaves': None})
+    
+    grupos_data = []
+    for grupo in torneo.grupos:
+        partidos_grupo = [p for p in torneo.partidos if p.grupo == grupo.nombre]
+        grupos_data.append({
+            'nombre': grupo.nombre,
+            'equipos': [{
+                'id': e.id,
+                'nombre': e.nombre,
+                'juvenil_id': e.juvenil_id,
+                'ganados': e.ganados,
+                'empatados': e.empatados,
+                'perdidos': e.perdidos,
+                'goles_favor': e.goles_favor,
+                'goles_contra': e.goles_contra,
+                'puntos': e.puntos
+            } for e in grupo.equipos],
+            'partidos': [{
+                'id': p.id,
+                'equipo1': p.equipo1,
+                'equipo2': p.equipo2,
+                'jugado': p.jugado,
+                'goles1': p.goles1,
+                'goles2': p.goles2
+            } for p in partidos_grupo]
+        })
+    
+    llaves = generar_llaves_cruzadas(torneo)
+    
+    return jsonify({
+        'grupos': grupos_data,
+        'llaves': llaves,
+        'configuracion': torneo.configuracion
+    })
+
+@app.route('/api/grupos', methods=['POST', 'OPTIONS'])
 def crear_grupos():
     torneo = get_torneo_actual()
     data = request.json
@@ -335,7 +369,6 @@ def crear_grupos():
     if total_equipos / cantidad_grupos < 3:
         return jsonify({'error': f'Con {total_equipos} equipos no se pueden crear {cantidad_grupos} grupos (mínimo 3 por grupo)'}), 400
     
-    # Resetear estadísticas de equipos
     for equipo in torneo.equipos:
         equipo.ganados = 0
         equipo.empatados = 0
@@ -467,48 +500,8 @@ def crear_grupos():
         'configuracion': torneo.configuracion
     })
 
-@app.route('/api/grupos', methods=['GET'])
-def get_grupos():
-    torneo = get_torneo_actual()
-    if not torneo.grupos:
-        return jsonify({'message': 'No hay grupos creados', 'grupos': [], 'llaves': None})
-    
-    grupos_data = []
-    for grupo in torneo.grupos:
-        partidos_grupo = [p for p in torneo.partidos if p.grupo == grupo.nombre]
-        grupos_data.append({
-            'nombre': grupo.nombre,
-            'equipos': [{
-                'id': e.id,
-                'nombre': e.nombre,
-                'juvenil_id': e.juvenil_id,
-                'ganados': e.ganados,
-                'empatados': e.empatados,
-                'perdidos': e.perdidos,
-                'goles_favor': e.goles_favor,
-                'goles_contra': e.goles_contra,
-                'puntos': e.puntos
-            } for e in grupo.equipos],
-            'partidos': [{
-                'id': p.id,
-                'equipo1': p.equipo1,
-                'equipo2': p.equipo2,
-                'jugado': p.jugado,
-                'goles1': p.goles1,
-                'goles2': p.goles2
-            } for p in partidos_grupo]
-        })
-    
-    llaves = generar_llaves_cruzadas(torneo)
-    
-    return jsonify({
-        'grupos': grupos_data,
-        'llaves': llaves,
-        'configuracion': torneo.configuracion
-    })
-
 # ===== PARTIDOS =====
-@app.route('/api/partidos', methods=['GET'])
+@app.route('/api/partidos', methods=['GET', 'OPTIONS'])
 def get_partidos():
     torneo = get_torneo_actual()
     partidos_data = []
@@ -529,6 +522,11 @@ def get_partidos():
             'jugado': p.jugado
         })
     return jsonify(partidos_data)
+
+# Ruta OPTIONS explícita para resultados
+@app.route('/api/partidos/<int:partido_id>/resultado', methods=['OPTIONS'])
+def options_resultado(partido_id):
+    return '', 200
 
 @app.route('/api/partidos/<int:partido_id>/resultado', methods=['POST'])
 def registrar_resultado(partido_id):
@@ -676,7 +674,7 @@ def generar_llaves_cruzadas(torneo):
     
     return arbol
 
-@app.route('/api/vaciar', methods=['POST'])
+@app.route('/api/vaciar', methods=['POST', 'OPTIONS'])
 def vaciar_datos():
     torneo = get_torneo_actual()
     torneo.juveniles = []
@@ -686,7 +684,7 @@ def vaciar_datos():
     torneo.guardar()
     return jsonify({'message': 'Datos vaciados correctamente'})
 
-@app.route('/api/reiniciar', methods=['POST'])
+@app.route('/api/reiniciar', methods=['POST', 'OPTIONS'])
 def reiniciar_torneo():
     torneo = get_torneo_actual()
     torneo.grupos = []
