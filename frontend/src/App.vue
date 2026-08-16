@@ -70,6 +70,7 @@
         :configuracion="configuracion"
         @generarTorneo="mostrarDialogoGrupos"
         @registrarResultado="registrarResultado"
+        @recargarDatos="recargarDatos"
       />
 
       <Configuracion
@@ -237,6 +238,9 @@ export default {
         console.error('Error cargando datos:', error)
         this.mostrarError('Error al cargar los datos')
       }
+    },
+    recargarDatos() {
+      this.cargarDatos()
     },
     async cargarConfiguracion() {
       try {

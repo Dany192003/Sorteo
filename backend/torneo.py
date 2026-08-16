@@ -44,6 +44,7 @@ class Partido:
         self.goles2 = None
         self.ganador = None
         self.jugado = False
+        self.en_vivo = False  # Nuevo campo para indicar partido en vivo
 
 class Torneo:
     def __init__(self, nombre, archivo=None):
@@ -121,7 +122,8 @@ class Torneo:
                 'goles1': p.goles1,
                 'goles2': p.goles2,
                 'ganador': p.ganador,
-                'jugado': p.jugado
+                'jugado': p.jugado,
+                'en_vivo': p.en_vivo
             })
         
         with open(self.archivo, 'w', encoding='utf-8') as f:
@@ -179,6 +181,7 @@ class Torneo:
                 partido.goles2 = p_data.get('goles2')
                 partido.ganador = p_data.get('ganador')
                 partido.jugado = p_data.get('jugado', False)
+                partido.en_vivo = p_data.get('en_vivo', False)
                 self.partidos.append(partido)
             
             self.grupos = []

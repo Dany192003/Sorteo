@@ -489,7 +489,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 2,
@@ -500,7 +501,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 3,
@@ -511,7 +513,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 4,
@@ -522,7 +525,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 5,
@@ -533,7 +537,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 6,
@@ -544,7 +549,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 7,
@@ -555,7 +561,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 8,
@@ -566,7 +573,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 9,
@@ -577,7 +585,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 10,
@@ -588,7 +597,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 11,
@@ -599,7 +609,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 12,
@@ -610,7 +621,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 13,
@@ -621,7 +633,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 14,
@@ -632,7 +645,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 15,
@@ -643,7 +657,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 16,
@@ -654,7 +669,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 17,
@@ -665,7 +681,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 18,
@@ -676,7 +693,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 19,
@@ -687,7 +705,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 20,
@@ -698,7 +717,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 21,
@@ -709,7 +729,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 22,
@@ -720,7 +741,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 23,
@@ -731,7 +753,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 24,
@@ -742,7 +765,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 25,
@@ -753,7 +777,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 26,
@@ -764,7 +789,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 27,
@@ -775,7 +801,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     },
     {
       "id": 28,
@@ -786,7 +813,8 @@
       "goles1": null,
       "goles2": null,
       "ganador": null,
-      "jugado": false
+      "jugado": false,
+      "en_vivo": false
     }
   ],
   "total_equipos": 17,

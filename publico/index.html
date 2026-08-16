@@ -50,6 +50,8 @@
         .partido-card .vs { color: #e63946; font-weight: 700; font-size: 0.65rem; }
         .partido-card .resultado { text-align: center; margin-top: 4px; font-weight: 700; font-size: 0.8rem; color: #00b4d8; }
         .partido-card .resultado.pendiente { color: #e63946; }
+        .partido-card .en-vivo-tag { display: inline-block; color: #e63946; font-weight: 700; animation: pulse 1s infinite; margin-left: 6px; font-size: 0.7rem; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .llaves-d3 { background: rgba(0, 0, 0, 0.3); border-radius: 12px; padding: 20px; margin-top: 16px; border: 1px solid rgba(255, 255, 255, 0.05); overflow-x: auto; }
         .llaves-d3 svg { display: block; margin: 0 auto; width: 100%; height: auto; min-height: 500px; max-height: 80vh; }
         .campeon-box { text-align: center; padding: 15px; margin-top: 12px; background: linear-gradient(135deg, rgba(241, 196, 15, 0.15), rgba(241, 196, 15, 0.05)); border-radius: 12px; border: 2px solid rgba(241, 196, 15, 0.2); }
@@ -144,12 +146,11 @@
                         <span class="vs">vs</span>
                         <span class="e2">{{ partido.equipo2 }}</span>
                     </div>
-                    <div v-if="partido.jugado" class="resultado">
-                        🏆 {{ partido.goles1 }} - {{ partido.goles2 }}
-                        <span v-if="partido.ganador && partido.ganador !== 'Empate'" style="color: #48cae4;"> ({{ partido.ganador }})</span>
-                        <span v-else style="color: #bdc3c7;"> (Empate)</span>
+                    <div class="resultado">
+                        <span v-if="partido.jugado">🏆 {{ partido.goles1 }} - {{ partido.goles2 }}</span>
+                        <span v-else class="pendiente">⏳ Pendiente</span>
+                        <span v-if="partido.en_vivo" class="en-vivo-tag">🔴 EN VIVO</span>
                     </div>
-                    <div v-else class="resultado pendiente">⏳ Pendiente</div>
                 </div>
             </div>
         </div>
@@ -180,7 +181,6 @@ const fetchWithNgrok = (url, options = {}) => {
     });
 };
 
-// ===== Constantes D3 =====
 const NODE_WIDTH = 190;
 const NODE_HEIGHT = 60;
 const ROW_HEIGHT = NODE_HEIGHT / 2;
@@ -278,7 +278,6 @@ const app = createApp({
 
             const scalePos = (d) => ({ x: d.x * scale, y: d.y * scale });
 
-            // Conectores
             g.selectAll('.link')
                 .data(treeData.links())
                 .enter()
@@ -298,7 +297,6 @@ const app = createApp({
                 .style('stroke', 'rgba(33, 147, 176, 0.4)')
                 .style('stroke-width', `${1.5 * scale}px`);
 
-            // Nodos
             const nodeGroups = g.selectAll('.node')
                 .data(nodos)
                 .enter()
@@ -372,7 +370,6 @@ const app = createApp({
                 .style('pointer-events', 'none')
                 .text(d => d.data.id);
 
-            // Hover
             nodeGroups.on('mouseenter', function() {
                 d3.select(this).select('rect').transition().duration(150)
                     .style('stroke-width', `${2.5 * scale}px`)
@@ -431,9 +428,7 @@ const app = createApp({
                 ultimaActualizacion.value = new Date().toLocaleString();
                 status.value = { text: '✅ Conectado', class: 'success' };
 
-                nextTick(() => {
-                    setTimeout(renderTree, 200);
-                });
+                nextTick(() => { setTimeout(renderTree, 200); });
             } catch (e) {
                 console.error('Error:', e);
                 error.value = 'Error al cargar los datos. Verifica que el backend esté corriendo.';

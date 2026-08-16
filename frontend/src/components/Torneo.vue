@@ -44,6 +44,8 @@
             <div v-for="partido in getPartidosDelGrupo(grupo.nombre)" :key="partido.id" class="partido-card">
               <div class="partido-header">
                 <span class="partido-etapa">{{ getNombreEtapa(partido.etapa) }}</span>
+                <span v-if="partido.en_vivo" class="en-vivo-tag">🔴 EN VIVO</span>
+                <span v-if="partido.jugado" class="finalizado-tag">✅ Finalizado</span>
               </div>
               <div class="partido-equipos">
                 <span class="equipo1-nombre">{{ partido.equipo1 }}</span>
@@ -60,11 +62,11 @@
                 </span>
                 <span v-else class="pendiente-tag">⏳ Pendiente</span>
               </div>
-              <div v-if="!partido.jugado" class="partido-actions">
-                <button @click="mostrarFormResultado(partido)" class="btn-small-success">📝 Registrar</button>
-              </div>
-              <div v-else class="partido-edit">
-                <button @click="mostrarFormResultado(partido)" class="btn-small-edit">✏️ Editar</button>
+              <div class="partido-actions">
+                <button v-if="!partido.jugado && !partido.en_vivo" @click="iniciarPartido(partido.id)" class="btn-small-live">▶️ Iniciar</button>
+                <button v-if="partido.en_vivo" class="btn-small-live" style="background: #e63946; animation: pulse 1s infinite;">🔴 EN VIVO</button>
+                <button v-if="!partido.jugado && partido.en_vivo" @click="mostrarFormResultado(partido)" class="btn-small-success">📝 Finalizar</button>
+                <button v-if="partido.jugado" @click="mostrarFormResultado(partido)" class="btn-small-edit">✏️ Editar</button>
               </div>
             </div>
           </div>
@@ -133,6 +135,13 @@
 import * as d3 from 'd3'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
+import axios from 'axios'
+
+const API_BASE_URL = 'http://localhost:5000/api'
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 10000
+})
 
 const NODE_WIDTH = 180
 const NODE_HEIGHT = 52
@@ -155,7 +164,7 @@ export default {
     partidos: Array,
     configuracion: Object
   },
-  emits: ['generarTorneo', 'registrarResultado'],
+  emits: ['generarTorneo', 'registrarResultado', 'recargarDatos'],
   data() {
     return {
       mostrarModal: false,
@@ -219,6 +228,16 @@ export default {
         'final': '🏆 Final'
       }
       return nombres[etapa] || etapa
+    },
+    async iniciarPartido(partidoId) {
+      try {
+        await api.post(`/partidos/${partidoId}/en_vivo`, { en_vivo: true })
+        // Recargar datos después de iniciar el partido
+        this.$emit('recargarDatos')
+      } catch (error) {
+        console.error('Error:', error)
+        alert('❌ Error al iniciar partido')
+      }
     },
     mostrarFormResultado(partido) {
       this.partidoSeleccionado = partido
@@ -616,7 +635,82 @@ export default {
   box-shadow: 0 5px 20px rgba(33, 147, 176, 0.4);
 }
 
-/* ===== GRUPOS ===== */
+.btn-small-live {
+  padding: 5px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  background: #00b4d8;
+  color: #fff;
+}
+
+.btn-small-live:hover {
+  background: #0077b6;
+  transform: scale(1.05);
+}
+
+.btn-small-success {
+  padding: 5px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  background: #00b4d8;
+  color: #fff;
+}
+
+.btn-small-success:hover {
+  background: #0077b6;
+  transform: scale(1.05);
+}
+
+.btn-small-edit {
+  padding: 5px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  background: rgba(72, 202, 228, 0.15);
+  color: #48cae4;
+  border: 1px solid rgba(72, 202, 228, 0.15);
+}
+
+.btn-small-edit:hover {
+  background: rgba(72, 202, 228, 0.25);
+  transform: scale(1.05);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.en-vivo-tag {
+  font-size: 0.6rem;
+  background: #e63946;
+  padding: 2px 10px;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: 700;
+  animation: pulse 1s infinite;
+}
+
+.finalizado-tag {
+  font-size: 0.6rem;
+  background: #00b4d8;
+  padding: 2px 10px;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: 600;
+}
+
 .grupos-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -665,7 +759,6 @@ export default {
   font-weight: 600;
 }
 
-/* ===== PARTIDOS POR GRUPO ===== */
 .partidos-por-grupo {
   display: flex;
   flex-direction: column;
@@ -710,8 +803,11 @@ export default {
 
 .partido-header {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .partido-etapa {
@@ -781,49 +877,14 @@ export default {
   font-weight: 600;
 }
 
-.partido-actions,
-.partido-edit {
+.partido-actions {
   display: flex;
   justify-content: center;
+  gap: 8px;
   margin-top: 8px;
+  flex-wrap: wrap;
 }
 
-.btn-small-success {
-  padding: 5px 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  background: #00b4d8;
-  color: #fff;
-}
-
-.btn-small-success:hover {
-  background: #0077b6;
-  transform: scale(1.05);
-}
-
-.btn-small-edit {
-  padding: 5px 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  background: rgba(72, 202, 228, 0.15);
-  color: #48cae4;
-  border: 1px solid rgba(72, 202, 228, 0.15);
-}
-
-.btn-small-edit:hover {
-  background: rgba(72, 202, 228, 0.25);
-  transform: scale(1.05);
-}
-
-/* ===== LLAVES ===== */
 .llaves-wrapper {
   position: relative;
 }
@@ -904,11 +965,6 @@ export default {
   animation: pulse 2s infinite;
 }
 
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-}
-
 .campeon {
   font-size: 1rem;
   font-weight: 700;
@@ -916,7 +972,6 @@ export default {
   letter-spacing: 2px;
 }
 
-/* ===== MODAL ===== */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1032,26 +1087,6 @@ export default {
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 14px;
-}
-
-.btn-success {
-  background: linear-gradient(135deg, #00b4d8, #0077b6);
-  color: #fff;
-}
-
-.btn-success:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(0, 180, 216, 0.4);
-}
-
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.08);
-  color: #e8f0fe;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.15);
 }
 
 .empty-state {

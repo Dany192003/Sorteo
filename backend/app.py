@@ -337,7 +337,8 @@ def get_grupos():
                 'equipo2': p.equipo2,
                 'jugado': p.jugado,
                 'goles1': p.goles1,
-                'goles2': p.goles2
+                'goles2': p.goles2,
+                'en_vivo': p.en_vivo
             } for p in partidos_grupo]
         })
     
@@ -483,7 +484,8 @@ def crear_grupos():
                 'equipo2': p.equipo2,
                 'jugado': p.jugado,
                 'goles1': p.goles1,
-                'goles2': p.goles2
+                'goles2': p.goles2,
+                'en_vivo': p.en_vivo
             } for p in partidos_grupo]
         })
     
@@ -519,7 +521,8 @@ def get_partidos():
             'goles1': p.goles1,
             'goles2': p.goles2,
             'ganador': p.ganador,
-            'jugado': p.jugado
+            'jugado': p.jugado,
+            'en_vivo': p.en_vivo
         })
     return jsonify(partidos_data)
 
@@ -544,6 +547,7 @@ def registrar_resultado(partido_id):
     partido.goles1 = goles1
     partido.goles2 = goles2
     partido.jugado = True
+    partido.en_vivo = False
     
     equipo1 = next((e for e in torneo.equipos if e.id == partido.equipo1), None)
     equipo2 = next((e for e in torneo.equipos if e.id == partido.equipo2), None)
@@ -597,6 +601,32 @@ def registrar_resultado(partido_id):
         'llaves_actualizadas': llaves
     })
 
+# ===== PARTIDO EN VIVO =====
+@app.route('/api/partidos/<int:partido_id>/en_vivo', methods=['OPTIONS'])
+def options_en_vivo(partido_id):
+    return '', 200
+
+@app.route('/api/partidos/<int:partido_id>/en_vivo', methods=['POST'])
+def toggle_en_vivo(partido_id):
+    torneo = get_torneo_actual()
+    data = request.json
+    en_vivo = data.get('en_vivo')
+    
+    partido = next((p for p in torneo.partidos if p.id == partido_id), None)
+    if not partido:
+        return jsonify({'error': 'Partido no encontrado'}), 404
+    
+    partido.en_vivo = en_vivo
+    torneo.guardar()
+    
+    return jsonify({
+        'message': 'Estado de partido actualizado',
+        'partido': {
+            'id': partido.id,
+            'en_vivo': partido.en_vivo
+        }
+    })
+
 # ===== REINICIAR RESULTADOS =====
 @app.route('/api/reiniciar_resultados', methods=['POST', 'OPTIONS'])
 def reiniciar_resultados():
@@ -607,6 +637,7 @@ def reiniciar_resultados():
         partido.goles2 = None
         partido.ganador = None
         partido.jugado = False
+        partido.en_vivo = False
     
     for equipo in torneo.equipos:
         equipo.ganados = 0
@@ -620,73 +651,61 @@ def reiniciar_resultados():
     
     return jsonify({'message': 'Resultados reiniciados correctamente'})
 
-# ===== LLAVES CRUZADAS (CORREGIDO) =====
+# ===== LLAVES CRUZADAS =====
 def generar_llaves_cruzadas(torneo):
     if not torneo.grupos:
         return None
     
-    # Obtener clasificados (1° y 2° de cada grupo)
     clasificados = {}
     for grupo in torneo.grupos:
         equipos_ordenados = sorted(grupo.equipos, key=lambda e: (-e.puntos, -e.goles_favor, e.goles_contra))
         if len(equipos_ordenados) >= 2:
             clasificados[grupo.nombre] = {
                 'primero': equipos_ordenados[0].nombre,
-                'segundo': equipos_ordenados[1].nombre,
-                'primero_id': equipos_ordenados[0].id,
-                'segundo_id': equipos_ordenados[1].id
+                'segundo': equipos_ordenados[1].nombre
             }
     
     if len(clasificados) < 2:
         return None
     
     grupos_ordenados = sorted(clasificados.keys())
-    
-    # Crear partidos de cuartos de final (cruce cruzado)
-    # 1A vs 2B, 1C vs 2D, 1B vs 2A, 1D vs 2C
     cuartos = []
+    
     for i in range(0, len(grupos_ordenados), 2):
         if i + 1 < len(grupos_ordenados):
             grupo1 = grupos_ordenados[i]
             grupo2 = grupos_ordenados[i + 1]
             
-            # Partido 1: 1° del grupo1 vs 2° del grupo2
             cuartos.append({
                 'id': f'P{len(cuartos) + 1}',
                 'equipo1': clasificados[grupo1]['primero'],
-                'equipo2': clasificados[grupo2]['segundo'],
-                'equipo1_id': clasificados[grupo1]['primero_id'],
-                'equipo2_id': clasificados[grupo2]['segundo_id']
+                'equipo2': clasificados[grupo2]['segundo']
             })
             
-            # Partido 2: 1° del grupo2 vs 2° del grupo1
             cuartos.append({
                 'id': f'P{len(cuartos) + 1}',
                 'equipo1': clasificados[grupo2]['primero'],
-                'equipo2': clasificados[grupo1]['segundo'],
-                'equipo1_id': clasificados[grupo2]['primero_id'],
-                'equipo2_id': clasificados[grupo1]['segundo_id']
+                'equipo2': clasificados[grupo1]['segundo']
             })
     
-    # Construir árbol de eliminación
-    def construir_arbol(partidos, inicio, fin):
+    def construir_arbol_desde_cuartos(cuartos, inicio, fin):
         if fin - inicio == 1:
-            p = partidos[inicio]
+            partido = cuartos[inicio]
             return {
-                'id': p['id'],
-                'equipo1': p['equipo1'],
-                'equipo2': p['equipo2'],
+                'id': partido['id'],
+                'equipo1': partido['equipo1'],
+                'equipo2': partido['equipo2'],
                 'children': []
             }
         
         mitad = (inicio + fin) // 2
-        izquierda = construir_arbol(partidos, inicio, mitad)
-        derecha = construir_arbol(partidos, mitad, fin)
+        izquierda = construir_arbol_desde_cuartos(cuartos, inicio, mitad)
+        derecha = construir_arbol_desde_cuartos(cuartos, mitad, fin)
         
-        nuevo_id = f'P{len(partidos) + (fin - inicio) // 2}'
+        partido_id = f'P{len(cuartos) + (fin - inicio) // 2}'
         
         return {
-            'id': nuevo_id,
+            'id': partido_id,
             'equipo1': f'Ganador {izquierda["id"]}',
             'equipo2': f'Ganador {derecha["id"]}',
             'children': [izquierda, derecha]
@@ -695,18 +714,16 @@ def generar_llaves_cruzadas(torneo):
     if len(cuartos) == 0:
         return None
     
-    # Construir el árbol completo
-    arbol = construir_arbol(cuartos, 0, len(cuartos))
+    arbol = construir_arbol_desde_cuartos(cuartos, 0, len(cuartos))
     
-    # Renombrar IDs para que sean secuenciales
-    def renombrar(nodo, contador):
+    def renombrar_ids(nodo, contador):
         if nodo['id'].startswith('P'):
             contador[0] += 1
             nodo['id'] = f'P{contador[0]}'
         for child in nodo.get('children', []):
-            renombrar(child, contador)
+            renombrar_ids(child, contador)
     
-    renombrar(arbol, [0])
+    renombrar_ids(arbol, [0])
     
     return arbol
 
