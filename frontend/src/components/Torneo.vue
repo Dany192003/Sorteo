@@ -137,10 +137,12 @@ import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import axios from 'axios'
 
-const API_BASE_URL = 'http://localhost:5000/api'
+// ===== USAR LA MISMA URL QUE APP.VUE =====
+const API_BASE_URL = 'https://torneo-futbol-juvenil.onrender.com/api';
+
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000
+  timeout: 30000
 })
 
 const NODE_WIDTH = 180
@@ -232,7 +234,6 @@ export default {
     async iniciarPartido(partidoId) {
       try {
         await api.post(`/partidos/${partidoId}/en_vivo`, { en_vivo: true })
-        // Recargar datos después de iniciar el partido
         this.$emit('recargarDatos')
       } catch (error) {
         console.error('Error:', error)
