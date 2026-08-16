@@ -101,7 +101,10 @@ import Torneo from './components/Torneo.vue'
 import Configuracion from './components/Configuracion.vue'
 import GestionTorneos from './components/GestionTorneos.vue'
 
-const API_BASE_URL = 'http://localhost:5000/api'
+// ===== CONFIGURACIÓN DE API =====
+// CAMBIA ESTA URL POR LA DE TU BACKEND EN RENDER
+const API_BASE_URL = 'https://torneo-futbol-juvenil.onrender.com/api';
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000
@@ -157,6 +160,7 @@ export default {
       try {
         const response = await api.get('/health')
         this.backendStatus = response.data
+        console.log('✅ Backend conectado:', this.backendStatus)
       } catch (error) {
         console.error('Error conectando al backend:', error)
         this.backendStatus = null
