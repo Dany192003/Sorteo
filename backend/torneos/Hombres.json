@@ -490,7 +490,7 @@
       "goles2": null,
       "ganador": null,
       "jugado": false,
-      "en_vivo": false
+      "en_vivo": true
     },
     {
       "id": 2,
