@@ -24,6 +24,9 @@
         .selector-torneo button:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(33, 147, 176, 0.4); }
         .selector-torneo button.secundario { background: rgba(255, 255, 255, 0.08); }
         .selector-torneo button.secundario:hover { background: rgba(255, 255, 255, 0.15); }
+        .autorefresh { font-size: 0.7rem; color: #8ecae6; display: flex; align-items: center; gap: 8px; }
+        .autorefresh .punto { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #00b4d8; animation: parpadeo 2s infinite; }
+        @keyframes parpadeo { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 20px; }
         .stat-card { background: rgba(255, 255, 255, 0.04); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.06); }
         .stat-number { font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, #2193b0, #6dd5ed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -50,7 +53,7 @@
         .partido-card .vs { color: #e63946; font-weight: 700; font-size: 0.65rem; }
         .partido-card .resultado { text-align: center; margin-top: 4px; font-weight: 700; font-size: 0.8rem; color: #00b4d8; }
         .partido-card .resultado.pendiente { color: #e63946; }
-        .partido-card .en-vivo-tag { display: inline-block; color: #00ff45; font-weight: 700; animation: pulse 1s infinite; margin-left: 6px; font-size: 0.7rem; }
+        .partido-card .en-vivo-tag { display: inline-block; color: #e63946; font-weight: 700; animation: pulse 1s infinite; margin-left: 6px; font-size: 0.7rem; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .llaves-d3 { background: rgba(0, 0, 0, 0.3); border-radius: 12px; padding: 20px; margin-top: 16px; border: 1px solid rgba(255, 255, 255, 0.05); overflow-x: auto; }
         .llaves-d3 svg { display: block; margin: 0 auto; width: 100%; height: auto; min-height: 500px; max-height: 80vh; }
@@ -98,6 +101,10 @@
         </select>
         <button @click="cargarTorneo()">📂 Cargar</button>
         <button @click="recargar()" class="secundario">🔄 Recargar</button>
+        <span class="autorefresh">
+            <span class="punto"></span>
+            Actualización automática cada 15s
+        </span>
     </div>
 
     <div v-if="cargando" class="loading">⏳ Cargando torneo...</div>
@@ -149,7 +156,7 @@
                     <div class="resultado">
                         <span v-if="partido.jugado">🏆 {{ partido.goles1 }} - {{ partido.goles2 }}</span>
                         <span v-else class="pendiente">⏳ Pendiente</span>
-                        <span v-if="partido.en_vivo" class="en-vivo-tag">🟢 EN VIVO</span>
+                        <span v-if="partido.en_vivo" class="en-vivo-tag">🔴 EN VIVO</span>
                     </div>
                 </div>
             </div>
@@ -170,7 +177,7 @@
 </div>
 
 <script>
-const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
+const { createApp, ref, computed, onMounted, watch, nextTick, onBeforeUnmount } = Vue;
 
 const API_BASE_URL = 'https://torneo-futbol-juvenil.onrender.com/api';
 
@@ -210,6 +217,7 @@ const app = createApp({
         const ultimaActualizacion = ref('');
         const llavesChart = ref(null);
         const llavesContainer = ref(null);
+        let intervalo = null;
 
         const partidosJugados = computed(() => partidos.value.filter(p => p.jugado).length);
         const partidosPendientes = computed(() => partidos.value.filter(p => !p.jugado).length);
@@ -452,7 +460,16 @@ const app = createApp({
 
         onMounted(() => {
             cargarTorneos();
-            setInterval(() => { if (datosCargados.value) recargar(); }, 60000);
+            // Auto-refresh cada 15 segundos
+            intervalo = setInterval(() => {
+                if (datosCargados.value) recargar();
+            }, 60000);
+        });
+
+        onBeforeUnmount(() => {
+            if (intervalo) {
+                clearInterval(intervalo);
+            }
         });
 
         return {
