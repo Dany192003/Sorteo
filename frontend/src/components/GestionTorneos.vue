@@ -75,6 +75,7 @@ export default {
       } catch (error) {
         console.error('Error cargando torneos:', error)
         alert('❌ Error al cargar torneos')
+        alert('Error al cargar torneos porfavor intente nuevamente')
       }
     },
     async crearTorneo() {
