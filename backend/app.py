@@ -13,7 +13,11 @@ CORS(app)
 
 # ===== CONFIGURACIÓN DE SUPABASE =====
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY") or os.environ.get("SUPABASE_KEY")
+SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY")  # Usar SOLO service_role
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise ValueError("SUPABASE_URL y SUPABASE_SERVICE_KEY son requeridos")
+
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ===== HEALTH =====
